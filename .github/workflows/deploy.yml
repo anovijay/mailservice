@@ -1,0 +1,47 @@
+name: Deploy Cloud Run Job
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Decode and Configure GCP Credentials
+      run: |
+        echo "${{ secrets.GCP_SA_KEY }}" | base64 -d > "${HOME}/gcloud.json"
+
+    - name: Authenticate with GCP
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+    - name: Set up gcloud
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: rhea-459720
+
+    - name: Configure Docker for Artifact Registry
+      run: gcloud auth configure-docker us-central1-docker.pkg.dev
+
+    - name: Build & Push Docker Image
+      run: |
+        IMAGE="us-central1-docker.pkg.dev/rhea-459720/mailservice-repo/mailservice-job"
+        docker build -t $IMAGE .
+        docker push $IMAGE
+
+    - name: Deploy Cloud Run Job
+      run: |
+        gcloud run jobs deploy mailservice-job \
+          --image=us-central1-docker.pkg.dev/rhea-459720/mailservice-repo/mailservice-job \
+          --region=us-central1 \
+          --service-account=mailservice-sa@rhea-459720.iam.gserviceaccount.com \
+          --max-retries=1 \
+          --memory=512Mi \
+          --command=python \
+          --args=main.py
