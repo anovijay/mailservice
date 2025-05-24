@@ -20,7 +20,8 @@ def run_job():
         messages = email_client.fetch_emails()
         for msg in messages:
             files = parser.extract_files(msg)
-
+            print("Extracted:", [f["filename"] for f in files])
+            
             if not files:
                 log_info("No files found in email.")
                 continue

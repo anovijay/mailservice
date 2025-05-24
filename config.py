@@ -9,9 +9,9 @@ class Config:
     EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
     EMAIL_SERVER = os.getenv("EMAIL_SERVER", "imap.gmail.com")
     EMAIL_PORT = int(os.getenv("EMAIL_PORT", 993))
-    GCS_BUCKET = os.getenv("GCS_BUCKET", "your-bucket")
-    EVENT_TOPIC = os.getenv("EVENT_TOPIC", "projects/your-project/topics/email-events")
-    PROJECT_ID = os.getenv("PROJECT_ID", "your-project")
+    GCS_BUCKET = os.getenv("GCS_BUCKET", "rhea_incoming_files")
+    EVENT_TOPIC = os.getenv("EVENT_TOPIC", "projects/rhea-459720/topics/mailman-new-email")
+    PROJECT_ID = os.getenv("PROJECT_ID", "rhea-459720")
     DEBUG = os.getenv("DEBUG", "false").lower() == "true"
 
 
