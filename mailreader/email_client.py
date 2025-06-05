@@ -29,7 +29,11 @@ class EmailClient:
 
         emails = []
         for num in data[0].split():
-            result, data = self.conn.fetch(num, '(RFC822)')
+            # imaplib returns message numbers as bytes, but the fetch command
+            # expects a string. Passing bytes would result in a literal
+            # representation like "b'1'" which fails. Decode to str first.
+            num_str = num.decode()
+            result, data = self.conn.fetch(num_str, '(RFC822)')
             raw_email = data[0][1]
             msg = email.message_from_bytes(raw_email)
             emails.append(msg)
